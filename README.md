@@ -13,7 +13,7 @@ use mini_log::{
 // Initalizes the Logger
 let mut logger = Logger::new_logger();
 
-// To add in a log.
+// To add in a log
 Logger::add_log(TEST_LOG, TEST_LOG_ID, &mut logger);
 // To add in a Warning.
 Logger::add_warning(TEST_WARN, TEST_WARN_ID, &mut logger);
