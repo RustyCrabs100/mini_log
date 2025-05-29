@@ -1,6 +1,13 @@
 [package]
 name = "mini_log"
 version = "0.1.0"
-edition = "2024"
+edition = "2018"
+authors = ["RustyCrabs100 rusty.crabs100@gmail.com"]
+description = "A logging crate for Rust, designed to be minimal"
+license = "MIT"
+repository = "https://github.com/RustyCrabs100/mini_log"
+readme = "README.md"
+keywords = ["logging", "minimal", "error"]
+categories = ["development-tools::debugging"]
 
 [dependencies]
