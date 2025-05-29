@@ -2,7 +2,7 @@
 A library for you to log all your warnings, errors, and information, all at once!
 
 ## How to use
-'''
+```
 // Imports everything
 use mini_log::{
     LoggingType, Logger, TEST_LOG, TEST_LOG_ID,
@@ -25,7 +25,7 @@ Logger::add_error(TEST_ERROR, TEST_ERROR_ID, &mut logger);
 // Error print the warning,
 // Error print the errors, then panics on the last error.
 Logger::parse_logger(&logger);
-'''
+```
 
 ## Why would you use mini_log?
 mini_log is used for minimalistic programs. mini_log offers the absolute bare minimum in 
