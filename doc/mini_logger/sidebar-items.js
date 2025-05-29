@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["TEST_ERROR","TEST_ERROR_ID","TEST_LOG","TEST_LOG_ID","TEST_WARN","TEST_WARN_ID"],"enum":["LoggingType"],"struct":["Logger"]};
