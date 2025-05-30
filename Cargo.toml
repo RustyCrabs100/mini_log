@@ -1,6 +1,6 @@
 [package]
 name = "mini_log"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2018"
 authors = ["RustyCrabs100 rusty.crabs100@gmail.com"]
 description = "A logging crate for Rust, designed to be minimal"

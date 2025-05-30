@@ -27,6 +27,27 @@ Logger::add_error(TEST_ERROR, TEST_ERROR_ID, &mut logger);
 Logger::parse_logger(&logger);
 ```
 
+### Multi-threaded usage
+```
+// Imports all the needed things
+use std::sync{mpsc, Mutex, Arc};
+use mini_log::{LoggingType, Logger}
+
+let logger = Arc::new(Mutex::new(Logger::new_logger()));
+
+let logger_cloned = Arc::clone(&logger);
+let (tx, rx) = mpsc::channel();
+let handle = thread::spawn(move || {
+    let mut logger_guard = logger_cloned.lock().unwrap();
+    Logger::add_log("Log1", 0, &mut logger_guard);
+    tx.send(logger_guard.clone()).unwrap();
+});
+
+rx.recv().unwrap();
+
+handle.join().unwrap();
+```
+
 ## Why would you use mini_log?
 mini_log is used for minimalistic programs. mini_log offers the absolute bare minimum in 
 Error Logging. If you don't need a fully fledged logger, this is the best choice! 
