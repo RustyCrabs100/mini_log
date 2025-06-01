@@ -1,121 +1,136 @@
-/// Defined for log testing.
+//! mini_log - A lightweight logger for all your needs, all at once! 
+//! 
+//! mini_log is used in situations where a fully fledged logger would be overkill or unneccesary. 
+//! If you need a lightweight logger, this is the best choice for you!
+//! 
+//! To initalize, create a mutable variable equal to the return value of new_logger()
+//! To add a value to the variable, call one of the following:
+//!     add_marker(Option<&str>, Option<usize>),
+//!     add_log(&str, usize),
+//!     add_warning(&str, usize),
+//!     or add_error(&str, usize).
+//! 
+//! We currently do not support no_std enviornments, but it is a big priority for future updates.
+//! We do support multi-threading, but async has not yet been tested.
+
+/// Used when a Marker is created with no info.
+pub const INIT_MARK: &'static str = "Logging Enabled";
+/// Used when a Marker is created with no ID.
+pub const INIT_MARK_ID: usize = 0;
+
+/// Used for testing the logging system.
 pub const TEST_LOG: &'static str = "Testing Log";
-/// Testing Logging ID.
-pub const TEST_LOG_ID: usize = 0000;
+/// Used for testing the logging ID system.
+pub const TEST_LOG_ID: usize = 1;
 
-/// Defined for testing the warning system.
+/// Used for testing the warning system.
 pub const TEST_WARN: &'static str = "Testing Warning";
-/// Testing Warning System ID.
-pub const TEST_WARN_ID: usize = 0001;
+/// Used for testing the warning ID system.
+pub const TEST_WARN_ID: usize = 2;
 
-/// Defined for testing error handling.
+/// Used for testing the error system.
 pub const TEST_ERROR: &'static str = "Testing Error";
-/// Testing Error Handling ID.
-pub const TEST_ERROR_ID: usize = 0002;
+/// Used for testing the error ID system.
+pub const TEST_ERROR_ID: usize = 3;
 
-/// A LoggingType Enum for defining the types of logs.
+/// An enum providing types for logging
 #[derive(Default, Clone, Debug, PartialEq)]
 pub enum LoggingType {
-    /// Error - Used for UNRECOVERABLE Errors, Panicing once the log parsing ends.
+    /// Error - Used for UNRECOVERABLE Errors. Panics when it's finished parsing.
     Error,
-    /// Warn - Used for potentially hazardous behavior.
-    Warn,
-    /// Log - Used for simple information printing.
+    /// Warning - Used for potentially hazardous behavior logging.
+    Warning,
+    /// Log - Used for basic information printing
     Log,
-    /// Marker - Used for Marking and event
-    /// Has no ID, and prints out "Marker Log"
+    /// Marker - Used for when you want to mark a point in your program. 
+    /// Declared the default value.
     #[default]
     Marker,
 }
 
-/// A Logger Struct for containing logging values.
+/// A struct containing logging info.
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct Logger {
-    /// Contains the Logging Message.
-    log: String,
-    /// Contains the Logging ID.
-    log_id: usize,
-    /// Contains the Logging Type.
-    log_type: LoggingType,
+    /// log - A vector of strings for containing logging info.
+    log: Vec<String>,
+    /// log_id - A vector of usizes for containing logging ID's.
+    log_id: Vec<usize>,
+    /// log_type - A vector of LoggingType's for containing log types.
+    log_type: Vec<LoggingType>,
 }
 
 impl Logger {
-    /// Creates a new Logger Vector.
-    pub fn new_logger() -> Vec<Self> {
-        vec![Logger {
-            log: "Logger Initalized".to_string(),
-            log_id: 0,
-            log_type: LoggingType::Log,
-        }]
+    /// Creates a new logger
+    pub fn new_logger() -> Self {
+        Self {
+            log: vec![INIT_MARK.to_string()],
+            log_id: vec![INIT_MARK_ID],
+            log_type: vec![LoggingType::Marker],
+        }
     }
 
-    /// Adds a Marker value to the Logger
-    pub fn add_marker(collector: &mut Vec<Self>) {
-        collector.push(Logger {
-            log: "Marker Log".to_string(),
-            ..Default::default()
-        })
+    /// Adds a new Marker to your logger
+    /// Can be called with values equal to None
+    pub fn add_marker(&mut self, log: Option<&str>, log_id: Option<usize>) {
+        let log_str = log.unwrap_or(INIT_MARK);
+        let log_id_val = log_id.unwrap_or(INIT_MARK_ID);
+        self.log.push(log_str.to_string());
+        self.log_id.push(log_id_val);
+        self.log_type.push(LoggingType::Marker);
     }
 
-    /// Adds a Log value to the Logger.
-    pub fn add_log(log: &str, log_id: usize, collector: &mut Vec<Self>) {
-        collector.push(Logger {
-            log: log.to_string(),
-            log_id,
-            log_type: LoggingType::Log,
-        })
+    /// Adds a new Log to your logger
+    pub fn add_log(&mut self, log: &str, log_id: usize) {
+        self.log.push(log.to_string());
+        self.log_id.push(log_id);
+        self.log_type.push(LoggingType::Log);
     }
 
-    /// Adds a Warning value to the Logger.
-    pub fn add_warning(log: &str, log_id: usize, collector: &mut Vec<Self>) {
-        collector.push(Logger {
-            log: log.to_string(),
-            log_id,
-            log_type: LoggingType::Warn,
-        });
+    /// Adds a new Warning to your logger
+    pub fn add_warning(&mut self, log: &str, log_id: usize) {
+        self.log.push(log.to_string());
+        self.log_id.push(log_id);
+        self.log_type.push(LoggingType::Warning);
     }
 
-    /// Adds an Error value to the Logger.
-    /// WARNING! This is designed for UNRECOVERABLE Errors.
-    /// Currently, recoverable errors are not supported.
-    pub fn add_error(log: &str, log_id: usize, collector: &mut Vec<Self>) {
-        collector.push(Logger {
-            log: log.to_string(),
-            log_id,
-            log_type: LoggingType::Error,
-        })
+    /// Adds a new Error to your logger
+    pub fn add_error(&mut self, log: &str, log_id: usize) {
+        self.log.push(log.to_string());
+        self.log_id.push(log_id);
+        self.log_type.push(LoggingType::Error);
     }
 
-    /// Parses the Logger for Errors, Warnings, and Logs.
-    /// Prints them out to the terminal as their defined types.
-    pub fn parse_logger(collector: &Vec<Logger>) {
-        let mut last_error: Option<&Logger> = None;
+    /// Parses the Logger
+    /// Behavior with the following:
+    /// A Marker - Prints out the Marker Info.
+    /// A Log - Prints out the Log Info and Log ID.
+    /// A Warning - Error Prints the Warning Info and Warning ID.
+    /// An Error - Error Prints the Error Info and Error ID, then panics.
+    pub fn parse_logger(&self) {
+        let mut last_error: Option<usize> = None;
 
-        for items in collector {
-            match items.log_type {
+        for i in 0..self.log.len() {
+            match self.log_type[i] {
                 LoggingType::Marker => {
-                    println!("[MARKER]: {}", items.log)
+                    println!("[MARKER]: {}", self.log[i])
                 }
                 LoggingType::Log => {
-                    println!("[LOG]: Info: {}; Info ID: {}", items.log, items.log_id)
+                    println!("[LOG]: Info: {}; Info ID: {}", self.log[i], self.log_id[i])
                 }
-                LoggingType::Warn => {
-                    eprintln!(
-                        "[WARNING]: Warning: {}; Warning ID: {}",
-                        items.log, items.log_id
-                    )
+                LoggingType::Warning => {
+                    eprintln!("[WARNING]: Warning: {}; Warning ID: {}", self.log[i], self.log_id[i])
                 }
                 LoggingType::Error => {
-                    eprintln!("[ERROR]: Error: {}; Error ID: {}", items.log, items.log_id);
-                    last_error = Some(items)
+                    eprintln!("[ERROR]: Error: {}; Error ID: {}", self.log[i], self.log_id[i]);
+                    last_error = Some(i);
                 }
             }
         }
 
-        if let Some(err) = last_error {
+        if let Some(idx) = last_error {
             panic!(
                 "[ERROR]: Final Error: Error: {}; Error ID: {}",
-                err.log, err.log_id
+                self.log[idx], self.log_id[idx]
             )
         }
     }
@@ -129,30 +144,30 @@ mod mini_log_tests {
     fn marking_test() {
         let mut logger = Logger::new_logger();
 
-        Logger::add_marker(&mut logger);
-        Logger::add_marker(&mut logger);
+        logger.add_marker(None, None);
+        logger.add_marker(None, None);
 
-        Logger::parse_logger(&logger);
+        logger.parse_logger();
     }
 
     #[test]
     fn logging_test() {
         let mut logger = Logger::new_logger();
 
-        Logger::add_log(TEST_LOG, TEST_LOG_ID, &mut logger);
-        Logger::add_log(TEST_LOG, TEST_LOG_ID, &mut logger);
+        logger.add_log(TEST_LOG, TEST_LOG_ID);
+        logger.add_log(TEST_LOG, TEST_LOG_ID);
 
-        Logger::parse_logger(&logger);
+        logger.parse_logger();
     }
 
     #[test]
     fn warning_test() {
         let mut logger = Logger::new_logger();
 
-        Logger::add_warning(TEST_WARN, TEST_WARN_ID, &mut logger);
-        Logger::add_warning(TEST_WARN, TEST_WARN_ID, &mut logger);
+        logger.add_warning(TEST_WARN, TEST_WARN_ID);
+        logger.add_warning(TEST_WARN, TEST_WARN_ID);
 
-        Logger::parse_logger(&logger);
+        logger.parse_logger();
     }
 
     #[test]
@@ -160,10 +175,10 @@ mod mini_log_tests {
     fn error_test() {
         let mut logger = Logger::new_logger();
 
-        Logger::add_error(TEST_ERROR, TEST_ERROR_ID, &mut logger);
-        Logger::add_error(TEST_ERROR, TEST_ERROR_ID, &mut logger);
+        logger.add_error(TEST_ERROR, TEST_ERROR_ID);
+        logger.add_error(TEST_ERROR, TEST_ERROR_ID);
 
-        Logger::parse_logger(&logger);
+        logger.parse_logger();
     }
 
     #[test]
@@ -171,11 +186,12 @@ mod mini_log_tests {
     fn full_test() {
         let mut logger = Logger::new_logger();
 
-        Logger::add_error(TEST_ERROR, TEST_ERROR_ID, &mut logger);
-        Logger::add_warning(TEST_WARN, TEST_WARN_ID, &mut logger);
-        Logger::add_log(TEST_LOG, TEST_LOG_ID, &mut logger);
+        logger.add_marker(None, None);
+        logger.add_log(TEST_LOG, TEST_LOG_ID);
+        logger.add_warning(TEST_WARN, TEST_WARN_ID);
+        logger.add_error(TEST_ERROR, TEST_ERROR_ID);
 
-        Logger::parse_logger(&logger);
+        logger.parse_logger();
     }
 
     use std::sync::Arc;
@@ -183,7 +199,7 @@ mod mini_log_tests {
 
     #[test]
     fn multi_threading_test() {
-        let mut logger = Arc::new(Logger::new_logger());
+        let logger = Arc::new(Logger::new_logger());
 
         let mut logger_2nd_thread = Arc::clone(&logger);
         thread::spawn(move || {
@@ -211,16 +227,15 @@ mod mini_log_tests {
             let tx_cloned = tx.clone();
 
             let handle = thread::spawn(move || {
-                {
-                    let mut logger_guard = logger_cloned.lock().unwrap();
-                    Logger::add_log(TEST_LOG, TEST_LOG_ID, &mut logger_guard);
-                }
+                
+                let mut logger_guard = logger_cloned.lock().unwrap();
+                logger_guard.add_log(TEST_LOG, TEST_LOG_ID);
+                
                 let mut data_in_thread = data_cloned.lock().unwrap();
                 *data_in_thread += 1;
 
                 if *data_in_thread == n {
-                    let logger_final = logger_cloned.lock().unwrap();
-                    tx_cloned.send(logger_final.clone()).unwrap();
+                    tx_cloned.send(logger_guard.clone()).unwrap();
                 }
             });
             handles.push(handle);
@@ -241,7 +256,7 @@ mod mini_log_tests {
         let (tx, rx) = mpsc::channel();
         let handle = thread::spawn(move || {
             let mut logger_guard = logger_cloned.lock().unwrap();
-            Logger::add_log("Log1", 0, &mut logger_guard);
+            logger_guard.add_log(TEST_LOG, TEST_LOG_ID);
             tx.send(logger_guard.clone()).unwrap();
         });
 
