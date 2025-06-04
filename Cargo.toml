@@ -1,6 +1,6 @@
 [package]
 name = "mini_log"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2018"
 authors = ["RustyCrabs100 rusty.crabs100@gmail.com"]
 description = "A logging crate for Rust, designed to be minimal"
@@ -11,3 +11,6 @@ keywords = ["logging", "minimal", "error"]
 categories = ["development-tools::debugging"]
 
 [dependencies]
+
+[features]
+no_std = []

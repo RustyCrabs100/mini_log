@@ -59,6 +59,13 @@ mini_log is used for minimalistic programs. mini_log offers the absolute bare mi
 Error Logging. If you don't need a fully fledged logger, this is the best choice! 
 
 ## Plans for the Future
- 1. Adding no_std support
+ 1. Adding no_std support (COMPLETED)
  2. Adding Recoverable Error Handling.
  3. Optimize the crate further.
+
+## WARNING!
+Currently no_std support is not being tested. \
+The Rust Borrow Checker does not complain. \
+The Program conditionally compiles using the feature flag. \
+Each Module is enabled or disabled using condition compiling. \
+HOWEVER! You should always be careful. Test for your platform before usage!
