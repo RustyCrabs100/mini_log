@@ -194,6 +194,7 @@ pub mod no_std_logger {
         /// log_type - An array of 1024 LoggingTypeNS's
         log_type: [LoggingTypeNS; MAX_LOG_ENTRIES],
         /// free_slots - an array of 1024 booleans for constant time lookup
+        // TODO: Replace this with a u16 counter for 0(1) lookup time.
         free_slots: [bool; MAX_LOG_ENTRIES]
     }
 
@@ -209,14 +210,17 @@ pub mod no_std_logger {
                 log: [[0; 1024]; 1024],
                 log_id: [0; 1024],
                 log_type: [LoggingTypeNS::Marker; 1024],
+                // To replace with u16 counter, set the counter value to 0
                 free_slots: [true; 1024],
             }
         }
 
         /// Goes through the arrays, and gets the first empty slot.
+        // Potential: Remove this Function (if the way slot accessing changes allows this)
         fn get_next_avaliable_slot(&mut self) -> Option<usize> {
             for i in 0..MAX_LOG_ENTRIES {
                 if self.free_slots[i] {
+                    // If the function is not removed, this would turn into: ` self.free_slot += 1 '
                     self.free_slots[i] = false;
                     return Some(i);
                 }
